@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>商品维护</title>
+    {{template "crm_link"}}
+</head>
+
+<body>
+<div class="wap">
+    {{template "crm_header" .}}
+    <div class="container body">
+        {{if not .user.IsAdmin}}
+            <div class="col-md-2"></div>
+        {{end}}
+        <div class="col-md-8">
+            <table id="grid-data" class="table table-condensed table-hover table-striped">
+                <colgroup>
+                    <col width="50px;"></col>
+                {{/*<col width="15%"></col>*/}}
+                    <col></col>
+                    <col></col>
+                    <col width="60px;"></col>
+                    <col width="60px;"></col>
+                    <col width="60px;"></col>
+                    <col width="140px;"></col>
+                    {{if .user.IsAdmin}}
+                    <col width="60px;"></col>
+                    {{end}}
+                </colgroup>
+                <thead>
+                <tr>
+                    <th data-column-id="id" data-type="numeric">ID</th>
+                    <th data-column-id="desc">名称</th>
+                    <th data-column-id="producttype_name">商品类别</th>
+                    <th data-column-id="price" data-type="numeric">进价</th>
+                    <th data-column-id="unit" >单位</th>
+                    <th data-column-id="qtycan" data-formatter="qtyview" >库存</th>
+                    <th data-column-id="udate" data-style="width:120px;">修改时间</th>
+                    {{if .user.IsAdmin}}
+                    <th data-column-id="commands" data-formatter="commands" data-sortable="false">操作</th>
+                    {{end}}
+                </tr>
+                </thead>
+            </table>
+        </div>
+        {{if .user.IsAdmin}}
+        <div class="col-md-4">
+            <fieldset id="edit-fieldset" style="display: none;">
+                <!-- class="" -->
+                <legend><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 商品编辑</legend>
+                <input type="hidden" id="edit-id">
+
+                <div class="form-group">
+                    <label for="edit-desc">商品名称</label>
+                    <input class="form-control" type="text" id="edit-desc"></input>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">商品简拼</div>
+                            <input type="text" disabled="" class="form-control" id="edit-no" placeholder="商品编号">
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>商品类别：</label>
+                    <select id="edit-producttype-select" class="form-control">
+                        <option value="0">全部</option>
+                    {{ range .ptypes }}
+                        <option value="{{.Id}}">{{.Name}}</option>
+                    {{end}}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">单位</div>
+                        <input type="text"  class="form-control" id="edit-unit" placeholder="单位">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">进价</div>
+                        <input class="form-control" type="number" id="edit-price" placeholder="进价">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">售价</div>
+                        <input class="form-control" type="number" id="edit-saleprice" placeholder="售价">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">库存</div>
+                        <input class="form-control" type="number" id="edit-qtycan" placeholder="库存">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="form-remark">备注</label>
+                    <textarea   class="form-control" id="edit-remark" placeholder="备注"></textarea>
+                </div>
+
+                <button id="edit-submit" type="submit" class="btn btn-default">提交</button>
+                <button id="edit-back" type="submit" class="btn btn-default pull-right">返回</button>
+            </fieldset>
+            <fieldset id="add-fieldset">
+                <!-- class="fa fa-pencil-square-o" -->
+                <legend><i class="fa fa-file-o" aria-hidden="true"></i> 商品新增</legend>
+
+                <div class="form-group">
+                    <label for="form-desc">商品名称</label>
+                    <input class="form-control" type="text" id="form-desc"></input>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">商品简拼</div>
+                        <input type="text" disabled="" class="form-control" id="form-no" >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>商品类别：</label>
+                    <select id="form-producttype-select" class="form-control">
+                    {{ range .ptypes }}
+                        <option value="{{.Id}}">{{.Name}}</option>
+                    {{end}}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                    <div class="input-group-addon">单位</div>
+                    <input type="text"  class="form-control" id="form-unit" placeholder="单位">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">进价</div>
+                        <input class="form-control" type="number" id="form-price" placeholder="进价">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">售价</div>
+                        <input class="form-control" type="number" id="form-saleprice" placeholder="售价">
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">库存</div>
+                        <input class="form-control" type="number" id="form-qtycan" placeholder="库存">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="form-remark">备注</label>
+                    <textarea   class="form-control" id="form-remark" placeholder="备注"></textarea>
+                </div>
+
+                <button id="form-submit" type="submit" class="btn btn-default">提交</button>
+            </fieldset>
+        </div>
+         {{end}}
+    </div>
+</div>
+<script id="product-actonBar" type="text/html">
+    <div id="{{"{{ctx.id}}" }}" class="{{"{{css.header}}"}}">
+        <div class="row">
+            <div class="col-sm-12 actionBar">
+                <div class="form-group"
+                     style="margin: 0 20px 0 0;display:inline-block;vertical-align: middle;"
+                >
+                    <form class="form-inline">
+                    <div class="form-group">
+                    <label>商品类别：</label>
+                    <select id="producttype-select-query" class="form-control">
+                        <option value="0">全部</option>
+                    {{ range .ptypes }}
+                        <option value="{{.Id}}">{{.Name}}</option>
+                    {{end}}
+
+                    </select>
+                    </div>
+                    </form>
+                </div>
+                <p class="{{"{{css.search}}"}}"></p>
+                <p class="{{"{{css.actions}}"}}"></p>
+                <button id="do-export" class="btn btn-default">
+                    导出xlxs
+                </button>
+            </div>
+        </div>
+    </div>
+</script>
+{{template "crm_script"}}
+<script type="text/javascript" src="/public/plugins/pinyin/firstletter.js"></script>
+<script type="text/javascript" src="/public/plugins/pinyin/notone.js"></script>
+<script type="text/javascript" src="/public/plugins/pinyin/pinyinUtil.js"></script>
+<script type="text/javascript">
+
+    $("#form-desc").change(function () {
+        var val = $(this).val();
+        if (!val) {
+            $("#form-no").val("");
+        }
+        $("#form-no").val(pinyinUtil.getFirstLetter(val).toUpperCase() + ";" + pinyinUtil.getPinyin(val, "", false, false).toUpperCase());
+    });
+
+    $("#edit-desc").change(function () {
+        var val = $(this).val();
+        if (!val) {
+            $("#edit-no").val("");
+        }
+        $("#edit-no").val(pinyinUtil.getFirstLetter(val).toUpperCase() + ";" + pinyinUtil.getPinyin(val, "", false, false).toUpperCase());
+    });
+
+
+    var grid = $("#grid-data").bootgrid({
+        templates: {
+            header: $("#product-actonBar").html()
+        },
+        ajax: true,
+        post: function () {
+            return {
+                producttype: $("#producttype-select-query").val()
+            };
+        },
+        url: "/crm/product/query",
+        labels: {
+            all: "全部",
+            infos: "{{"{{ctx.start}}"}}-{{"{{ctx.end}}"}}/{{"{{ctx.total}}"}}",
+            loading: "加载...",
+            noResults: "没有数据!",
+            refresh: "刷新",
+            search: "查询"
+        },
+        formatters: {
+            "commands": function (column, row) {
+                return "<button type=\"button\" class=\"btn btn-xs btn-default command-edit\" data-row-id=\"" + row.id + "\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " +
+                        "<button type=\"button\" class=\"btn btn-xs btn-default command-delete\" data-row-id=\"" + row.id + "\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
+            },
+            "qtyview":function (column, row) {
+                if(row.qtycan<=0){
+                    return "<span class='label label-warning'>"+row.qtycan+"</span>";
+                }
+                return ""+row.qtycan;
+            }
+        }
+    }).on("loaded.rs.jquery.bootgrid", function () {
+        grid.find(".command-edit").on("click", function (e) {
+            showEditView($(this).data("row-id"))
+        }).end().find(".command-delete").on("click", function (e) {
+            del($(this).data("row-id"));
+        });
+        $("#producttype-select-query").unbind("change");
+        $("#producttype-select-query").change(function () {
+            grid.bootgrid("reload");
+        });
+    });
+
+
+    function del(id) {
+        if (!confirm("您确定要删除？删除后将无法恢复")) {
+            return;
+        }
+        $.post("/crm/product/del/" + id, {}, function (data) {
+            if (data.code == 0) {
+                toastr.success('商品删除成功', data.msg);
+                grid.bootgrid("reload");
+            } else {
+                toastr.error('商品删除失败', data.msg);
+            }
+        }, "json");
+    }
+
+    function showEditView(id) {
+        $.get("/crm/product/get/" + id, function (data) {
+            var div = $("#add-fieldset");
+            var div2 = $("#edit-fieldset");
+            div.hide();
+            div2.show();
+            $("#edit-id").val(data.id);
+            $("#edit-no").val(data.no);
+            $("#edit-desc").val(data.desc);
+            $("#edit-producttype-select").val(data.producttype_id);
+            $("#edit-price").val(data.price);
+            $("#edit-saleprice").val(data.saleprice);
+            $("#edit-qtycan").val(data.qtycan);
+            $("#edit-unit").val(data.unit);
+            $("#edit-remark").val(data.remark);
+        }, "json");
+    }
+
+    $(document).ready(function (e) {
+        $("#do-export").click(function () {
+            var url = "/crm/product/export";
+            var $form = $("<form style='display: none' action='" + url + "'>"
+                    + "<input type='hidden' name='searchPhrase' value='"+$(".search-field").val()+"'>"
+                    + "<input type='hidden' name='producttype' value='"+$("#producttype-select-query").val()+"'>"
+                    + "</form>");
+            $form.appendTo("body");
+            $form.submit();
+            $form.remove();
+        });
+        $("#form-submit").click(function (e) {
+            var no = $("#form-no").val();
+            if (!no) {
+                toastr.error('商品编号不能为空', '请输入商品编号！');
+                return;
+            }
+            var desc = $("#form-desc").val();
+            if (!desc) {
+                toastr.error('商品名称不能为空', '请输入商品名称！');
+                return;
+            }
+            var price = $("#form-price").val();
+            var saleprice = $("#form-saleprice").val();
+            var qtycan = $("#form-qtycan").val();
+            var param = {
+                no: no,
+                desc: desc,
+                producttype_id: $("#form-producttype-select").val(),
+                price: price,
+                saleprice: saleprice,
+                qtycan: qtycan,
+                unit: $("#form-unit").val(),
+                remark:$("#form-remark").val()
+            };
+            $.post("/crm/product/add", param, function (data) {
+                if (data.code == 0) {
+                    toastr.success('商品添加成功', data.msg);
+                    grid.bootgrid("reload");
+                } else {
+                    if (data.msg == "UNIQUE constraint failed: product.no") {
+                        data.msg = "商品编号已存在";
+                    }
+                    toastr.error('商品添加失败', data.msg);
+                }
+            }, "json");
+        });
+        $("#edit-back").click(function (e) {
+            $("#add-fieldset").show();
+            $("#edit-fieldset").hide();
+        });
+        $("#edit-submit").click(function (e) {
+            var id = $("#edit-id").val();
+            var no = $("#edit-no").val();
+            var desc = $("#edit-desc").val();
+            if (!desc) {
+                toastr.error('商品名称不能为空', '请输入商品名称！');
+                return;
+            }
+            var price = $("#edit-price").val();
+            var saleprice = $("#edit-saleprice").val();
+            var qtycan = $("#edit-qtycan").val();
+
+            var param = {
+                no: no,
+                desc: desc,
+                price: price,
+                saleprice: saleprice,
+                producttype_id: $("#edit-producttype-select").val(),
+                qtycan: qtycan,
+                unit: $("#edit-unit").val(),
+                remark:$("#edit-remark").val()
+            };
+            $.post("/crm/product/edit/" + id, param, function (data) {
+                if (data.code == 0) {
+                    toastr.success('商品修改成功', data.msg);
+                    grid.bootgrid("reload");
+                } else {
+                    toastr.error('商品添加失败', data.msg);
+                }
+                $("#add-fieldset").show();
+                $("#edit-fieldset").hide();
+            }, "json");
+        });
+    });
+</script>
+</body>
+</html>
